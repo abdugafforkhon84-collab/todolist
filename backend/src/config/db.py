@@ -20,7 +20,7 @@ def get_db():
 def init_db():
     from ..models.user import User
     from ..models.record import Record
-    from passlib.context import CryptContext
+    from ..controllers.auth_controller import get_password_hash
     
     Base.metadata.create_all(bind=engine)
     
@@ -29,10 +29,9 @@ def init_db():
         # Check if users exist, create default admin
         admin = db.query(User).filter(User.username == "admin").first()
         if not admin:
-            pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
             admin_user = User(
                 username="admin",
-                hashed_password=pwd_context.hash("admin123"),
+                hashed_password=get_password_hash("admin123"),
                 full_name="Главный администратор",
                 role="admin"
             )
