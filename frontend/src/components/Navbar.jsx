@@ -50,8 +50,8 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* 3 Основные кнопки навигации (Записи, Долг, Архив) */}
-        <nav className="nav-tabs">
+        {/* 3 Основные кнопки навигации (для десктопа) */}
+        <nav className="nav-tabs desktop-only">
           <button
             type="button"
             className={`nav-tab-btn ${activeTab === 'Записи' ? 'active' : ''}`}
@@ -89,26 +89,26 @@ export const Navbar = () => {
         <div className="navbar-actions">
           {isInstallable && (
             <button
-              className="btn btn-outline btn-sm"
+              className="btn btn-outline btn-sm pwa-install-btn"
               onClick={handleInstallClick}
               title="Установить PWA на устройство"
             >
-              <IconDownload size={16} />
+              <IconDownload size={14} />
               <span>Установить</span>
             </button>
           )}
 
           <div className="user-badge" title="Текущий пользователь">
-            <IconUser size={16} />
-            <span>{user?.full_name || user?.username || 'Админ'}</span>
+            <IconUser size={14} />
+            <span className="user-name-text">{user?.full_name || user?.username || 'Админ'}</span>
           </div>
 
           <button
-            className="btn btn-outline btn-sm"
+            className="btn btn-outline btn-sm logout-btn"
             onClick={logout}
             title="Выйти из системы"
           >
-            <IconLogOut size={16} />
+            <IconLogOut size={14} />
             <span>Выход</span>
           </button>
         </div>

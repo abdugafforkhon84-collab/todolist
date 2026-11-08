@@ -10,46 +10,26 @@ export const DebtsPage = () => {
   return (
     <div>
       {/* Debt Summary Banner */}
-      <div style={{
-        background: '#fff1f2',
-        border: '1px solid #fecdd3',
-        borderRadius: 'var(--radius-lg)',
-        padding: '16px 20px',
-        marginBottom: 20,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: 12
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            backgroundColor: '#ffe4e6',
-            color: '#e11d48',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <IconAlert size={22} />
+      <div className="debt-alert-banner">
+        <div className="debt-alert-left">
+          <div className="debt-alert-icon">
+            <IconAlert size={18} />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: '#9f1239', fontWeight: 600, textTransform: 'uppercase' }}>
+            <div className="debt-alert-title">
               Контроль задолженностей
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#881337' }}>
-              Здесь собраны клиенты с частичной оплатой или предоплатой
+            <div className="debt-alert-desc">
+              Клиенты с частичной оплатой или долгом
             </div>
           </div>
         </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.75rem', color: '#9f1239', textTransform: 'uppercase', fontWeight: 700 }}>
+        <div className="debt-alert-amount-box">
+          <div className="debt-alert-amount-label">
             Сумма к доплате
           </div>
-          <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#be123c', fontFamily: 'var(--font-mono)' }}>
+          <div className="debt-alert-amount-val">
             {formatCurrency(stats.total_debt)}
           </div>
         </div>

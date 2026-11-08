@@ -2,6 +2,7 @@ import React from 'react';
 import { AuthProvider, useAuth } from './store/AuthContext';
 import { RecordProvider, useRecords } from './store/RecordContext';
 import { Navbar } from './components/Navbar';
+import { BottomNav } from './components/BottomNav';
 import { RecordsPage } from './pages/RecordsPage';
 import { DebtsPage } from './pages/DebtsPage';
 import { ArchivePage } from './pages/ArchivePage';
@@ -36,40 +37,40 @@ const DashboardContent = () => {
         {/* Верхняя аналитическая панель (Dashboard Stats) */}
         <section className="stats-banner">
           <div className="stat-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="stat-card-header">
               <span className="stat-card-title">В работе (Активно)</span>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconRecords size={17} color="#4f46e5" />
+              <div className="stat-card-icon-box icon-active">
+                <IconRecords size={16} />
               </div>
             </div>
             <span className="stat-card-value">{stats.active_count}</span>
           </div>
 
           <div className="stat-card" style={{ borderColor: stats.debt_count > 0 ? '#fecdd3' : undefined }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="stat-card-header">
               <span className="stat-card-title">Клиентов с долгом</span>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: '#fff1f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconDebt size={17} color="#e11d48" />
+              <div className="stat-card-icon-box icon-debt">
+                <IconDebt size={16} />
               </div>
             </div>
             <span className="stat-card-value debt-text">{stats.debt_count}</span>
           </div>
 
           <div className="stat-card" style={{ borderColor: stats.total_debt > 0 ? '#fecdd3' : undefined }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span className="stat-card-title">Общий долг клиентов</span>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: '#fff1f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconAlert size={17} color="#e11d48" />
+            <div className="stat-card-header">
+              <span className="stat-card-title">Общий долг</span>
+              <div className="stat-card-icon-box icon-debt">
+                <IconAlert size={16} />
               </div>
             </div>
             <span className="stat-card-value debt-text">{formatCurrency(stats.total_debt)}</span>
           </div>
 
           <div className="stat-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span className="stat-card-title">Фактически получено</span>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconCheck size={17} color="#059669" />
+            <div className="stat-card-header">
+              <span className="stat-card-title">Получено оплат</span>
+              <div className="stat-card-icon-box icon-revenue">
+                <IconCheck size={16} />
               </div>
             </div>
             <span className="stat-card-value revenue-text">{formatCurrency(stats.total_revenue)}</span>
@@ -88,7 +89,7 @@ const DashboardContent = () => {
           title="Добавить новую запись"
           aria-label="Добавить запись"
         >
-          <IconPlus size={28} />
+          <IconPlus size={24} />
         </button>
 
         {/* Модальное окно создания / редактирования записи */}
@@ -108,6 +109,9 @@ const DashboardContent = () => {
           record={payingRecord}
         />
       </main>
+
+      {/* Нижняя мобильная панель навигации */}
+      <BottomNav />
     </div>
   );
 };

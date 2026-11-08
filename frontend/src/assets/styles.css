@@ -255,7 +255,7 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 18px 22px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -281,20 +281,53 @@ body {
   border-color: #cbd5e1;
 }
 
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stat-card-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card-icon-box.icon-active {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.stat-card-icon-box.icon-debt {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.stat-card-icon-box.icon-revenue {
+  background: #ecfdf5;
+  color: #059669;
+}
+
 .stat-card-title {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   font-weight: 700;
   color: var(--text-muted);
 }
 
 .stat-card-value {
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
   letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .stat-card-value.debt-text {
@@ -303,6 +336,69 @@ body {
 
 .stat-card-value.revenue-text {
   color: #059669;
+}
+
+/* Debt Alert Banner */
+.debt-alert-banner {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.debt-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.debt-alert-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #ffe4e6;
+  color: #e11d48;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.debt-alert-title {
+  font-size: 0.82rem;
+  color: #9f1239;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.debt-alert-desc {
+  font-size: 0.8rem;
+  color: #881337;
+}
+
+.debt-alert-amount-box {
+  text-align: right;
+}
+
+.debt-alert-amount-label {
+  font-size: 0.7rem;
+  color: #9f1239;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.debt-alert-amount-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #be123c;
+  font-family: var(--font-mono);
 }
 
 /* Toolbar & Filters */
@@ -912,81 +1008,529 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Mobile Responsive */
+/* Bottom Navigation Bar (Mobile Native App Style) */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -3px 14px rgba(15, 23, 42, 0.06);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 54px;
+  padding: 0 10px;
+}
+
+.bottom-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  user-select: none;
+}
+
+.bottom-nav-btn:active {
+  transform: scale(0.92);
+}
+
+.bottom-nav-icon-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 22px;
+}
+
+.bottom-nav-badge {
+  position: absolute;
+  top: -4px;
+  right: -9px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  line-height: 1;
+}
+
+.bottom-nav-badge.badge-danger {
+  background: #e11d48;
+}
+
+.bottom-nav-text {
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.2px;
+}
+
+.bottom-nav-btn.active {
+  color: var(--primary);
+}
+
+.bottom-nav-btn.active .bottom-nav-text {
+  font-weight: 700;
+}
+
+.bottom-nav-btn.active.debt-active {
+  color: #e11d48;
+}
+
+.bottom-nav-btn.active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 22px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.bottom-nav-btn.active.debt-active::after {
+  background: #e11d48;
+}
+
+/* On Desktop (width > 768px), hide bottom navigation */
+@media (min-width: 769px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Mobile Responsive Optimization (Phone screen ergonomics) */
 @media (max-width: 768px) {
+  /* Hide desktop top tabs */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Compact top navbar */
+  .navbar {
+    padding: 7px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
   .navbar-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .brand-section {
+    gap: 8px;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px -1px rgba(79, 70, 229, 0.35);
+  }
+
+  .brand-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .navbar-actions {
+    gap: 6px;
+  }
+
+  .user-badge {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    gap: 5px;
+    max-width: 110px;
+    border-radius: 6px;
+  }
+
+  .user-badge svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  .user-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    height: 28px;
+    border-radius: 6px;
+    gap: 4px;
+  }
+
+  .logout-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .pwa-install-btn {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  /* Main content padding (with bottom-nav clearance) */
+  .main-content {
+    padding: 10px 10px calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Compact 2x2 Stats Grid */
+  .stats-banner {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stat-card {
+    padding: 9px 11px;
+    gap: 3px;
+    border-radius: 12px;
+  }
+
+  .stat-card::before {
+    height: 2.5px;
+  }
+
+  .stat-card-title {
+    font-size: 0.67rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-muted);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stat-card-icon-box {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+  }
+
+  .stat-card-icon-box svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .stat-card-value {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* Compact Debt Banner */
+  .debt-alert-banner {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    gap: 8px;
+  }
+
+  .debt-alert-left {
+    gap: 8px;
+  }
+
+  .debt-alert-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .debt-alert-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .debt-alert-title {
+    font-size: 0.75rem;
+  }
+
+  .debt-alert-desc {
+    font-size: 0.72rem;
+  }
+
+  .debt-alert-amount-label {
+    font-size: 0.64rem;
+  }
+
+  .debt-alert-amount-val {
+    font-size: 1.05rem;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
-  .nav-tabs {
-    overflow-x: auto;
+  .search-box {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .search-box input {
+    height: 36px;
+    padding: 6px 10px 6px 32px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .search-icon {
+    left: 10px;
+  }
+
+  .search-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .toolbar-actions-row {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 8px;
   }
 
-  .nav-tab-btn {
-    flex: 1;
-    justify-content: center;
-    padding: 9px 12px;
-    font-size: 0.85rem;
+  .records-count-info {
+    font-size: 0.75rem;
   }
 
-  .main-content {
-    padding: 16px 12px 100px;
+  /* Compact Record Cards */
+  .records-grid {
+    gap: 8px;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
+  .record-card {
+    padding: 12px 14px;
+    gap: 10px;
+    border-radius: 12px;
   }
 
   .record-header {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
   }
 
+  .client-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .client-meta {
+    gap: 8px;
+    font-size: 0.74rem;
+    margin-top: 2px;
+  }
+
+  .meta-item {
+    font-size: 0.74rem;
+    gap: 3px;
+  }
+
+  .meta-item svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .task-description {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin: 0;
+  }
+
+  /* 3-Column Compact Finance Row */
   .finance-row {
     flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
+    gap: 8px;
+  }
+
+  .finance-numbers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    width: 100%;
+  }
+
+  .finance-item {
+    padding: 5px 6px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #f1f5f9;
+  }
+
+  .finance-label {
+    font-size: 0.6rem;
+    line-height: 1.1;
+  }
+
+  .finance-val {
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
   }
 
   .record-actions {
-    justify-content: stretch;
+    display: flex;
+    gap: 6px;
+    width: 100%;
   }
 
   .record-actions .btn {
     flex: 1;
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 0.74rem;
+    border-radius: 6px;
   }
 
+  /* Floating Action Button (above bottom nav) */
   .fab-btn {
-    bottom: 20px;
-    right: 20px;
-    width: 54px;
-    height: 54px;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-banner {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    right: 14px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
   }
 
-  .stat-card {
-    padding: 14px;
+  .fab-btn svg {
+    width: 22px;
+    height: 22px;
   }
 
-  .stat-card-value {
-    font-size: 1.25rem;
+  /* Compact Empty State */
+  .empty-state {
+    padding: 22px 14px;
+    border-radius: 12px;
+  }
+
+  .empty-state-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+  }
+
+  .empty-state-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .empty-state-title {
+    font-size: 0.92rem;
+    margin-bottom: 3px;
+  }
+
+  .empty-state-desc {
+    font-size: 0.75rem;
+    line-height: 1.35;
+    margin-bottom: 12px;
+  }
+
+  /* Compact Modals */
+  .modal-overlay {
+    padding: 8px;
+    align-items: flex-end;
   }
 
   .modal-content {
-    border-radius: var(--radius-lg);
+    border-radius: 16px 16px 0 0;
+    max-width: 100%;
+    max-height: 90vh;
   }
 
-  .modal-header, .modal-body, .modal-footer {
-    padding: 16px;
+  .modal-header {
+    padding: 12px 14px;
+  }
+
+  .modal-title {
+    font-size: 0.92rem;
+  }
+
+  .modal-body {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .modal-footer {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+
+  .modal-footer .btn {
+    height: 34px;
+    font-size: 0.78rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .form-label {
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+  }
+
+  .form-control {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 7px;
   }
 }
