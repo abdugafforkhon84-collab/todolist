@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: backend
+    env: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: python backend/run.py
+    healthCheckPath: /health
+    autoDeploy: true
+    region: oregon
+    envVars:
+      - key: PORT
+        value: "8000"
+  - type: static
+    name: frontend
+    env: node
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    autoDeploy: true
+    region: oregon
+    envVars:
+      - key: VITE_API_URL
+        value: "${RENDER_EXTERNAL_URL}/api"
+
