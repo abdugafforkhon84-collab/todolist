@@ -5,7 +5,7 @@ import { IconRecords, IconPlus, IconSearch } from '../assets/icons';
 import { Button } from '../components/ui/Button';
 
 export const RecordsPage = () => {
-  const { records, loading, search, setSearch, setIsRecordModalOpen, setEditingRecord } = useRecords();
+  const { records, stats, setActiveTab, loading, search, setSearch, setIsRecordModalOpen, setEditingRecord } = useRecords();
 
   const handleAddNew = () => {
     setEditingRecord(null);
@@ -54,12 +54,21 @@ export const RecordsPage = () => {
           <p className="empty-state-desc">
             {search
               ? 'Попробуйте изменить поисковый запрос.'
-              : 'В этом разделе отображаются текущие задачи в работе с полной оплатой. Нажмите «+» или кнопку ниже, чтобы добавить клиента.'}
+              : stats.debt_count > 0
+                ? `Здесь отображаются клиенты в работе с полной оплатой. Клиенты с частичной оплатой (${stats.debt_count}) собраны во вкладке «Долг».`
+                : 'В этом разделе отображаются текущие задачи в работе. Нажмите «+» или кнопку ниже, чтобы добавить клиента.'}
           </p>
           {!search && (
-            <Button variant="primary" onClick={handleAddNew} icon={<IconPlus size={16} />}>
-              Добавить клиента
-            </Button>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Button variant="primary" onClick={handleAddNew} icon={<IconPlus size={16} />}>
+                Добавить клиента
+              </Button>
+              {stats.debt_count > 0 && (
+                <Button variant="outline" onClick={() => setActiveTab('Долг')}>
+                  Открыть «Долг» ({stats.debt_count})
+                </Button>
+              )}
+            </div>
           )}
         </div>
       ) : (

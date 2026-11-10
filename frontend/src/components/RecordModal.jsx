@@ -5,6 +5,7 @@ import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { formatCurrency, calculateDebt } from '../utils/formatters';
 import { useRecords } from '../store/RecordContext';
+import { IconCalendar } from '../assets/icons';
 
 export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
   const { createRecord, updateRecord } = useRecords();
@@ -12,7 +13,8 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
   const [formData, setFormData] = useState({
     client_name: '',
     phone_number: '',
-    period: '',
+    period_start: '',
+    period_end: '',
     task_description: '',
     total_amount: '',
     paid_amount: '0',
@@ -22,22 +24,40 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Парсинг сохраненного периода в две даты (от - до)
+  const parsePeriod = (periodStr) => {
+    if (!periodStr) return { start: '', end: '' };
+    if (periodStr.includes(' — ')) {
+      const [s, e] = periodStr.split(' — ');
+      return { start: s.trim(), end: (e || '').trim() };
+    }
+    if (periodStr.includes(' - ')) {
+      const [s, e] = periodStr.split(' - ');
+      return { start: s.trim(), end: (e || '').trim() };
+    }
+    return { start: periodStr.trim(), end: periodStr.trim() };
+  };
+
   useEffect(() => {
     if (initialData) {
+      const { start, end } = parsePeriod(initialData.period || '');
       setFormData({
         client_name: initialData.client_name || '',
         phone_number: initialData.phone_number || '',
-        period: initialData.period || '',
+        period_start: start,
+        period_end: end || start,
         task_description: initialData.task_description || '',
         total_amount: initialData.total_amount ? String(initialData.total_amount) : '',
         paid_amount: initialData.paid_amount !== undefined ? String(initialData.paid_amount) : '0',
         is_completed: initialData.status === 'Архив',
       });
     } else {
+      const today = new Date().toISOString().split('T')[0];
       setFormData({
         client_name: '',
         phone_number: '',
-        period: '',
+        period_start: today,
+        period_end: today,
         task_description: '',
         total_amount: '',
         paid_amount: '0',
@@ -85,8 +105,12 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
       setErrorMsg('Сумма к оплате должна быть больше 0');
       return;
     }
-    if (!formData.period.trim()) {
-      setErrorMsg('Укажите срок / период');
+    if (!formData.period_start) {
+      setErrorMsg('Укажите дату начала периода (С)');
+      return;
+    }
+    if (!formData.period_end) {
+      setErrorMsg('Укажите дату окончания периода (По)');
       return;
     }
     if (!formData.task_description.trim()) {
@@ -94,13 +118,19 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
       return;
     }
 
+    // Формирование периода вида "YYYY-MM-DD — YYYY-MM-DD"
+    const periodString =
+      formData.period_start === formData.period_end
+        ? formData.period_start
+        : `${formData.period_start} — ${formData.period_end}`;
+
     setSubmitting(true);
     try {
       const payload = {
-        client_name: formData.client_name,
-        phone_number: formData.phone_number,
-        period: formData.period,
-        task_description: formData.task_description,
+        client_name: formData.client_name.trim(),
+        phone_number: formData.phone_number.trim(),
+        period: periodString,
+        task_description: formData.task_description.trim(),
         total_amount: totalNum,
         paid_amount: paidNum,
         is_completed: formData.is_completed,
@@ -123,7 +153,7 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? 'Редактирование записи клиента' : 'Добавить новую запись'}
+      title={initialData ? 'Редактирование записи' : 'Новая запись'}
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={submitting}>
@@ -135,9 +165,9 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
         </>
       }
     >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {errorMsg && (
-          <div style={{ padding: '10px 14px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#b91c1c', fontSize: '0.85rem' }}>
+          <div style={{ padding: '9px 12px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#b91c1c', fontSize: '0.82rem' }}>
             {errorMsg}
           </div>
         )}
@@ -148,7 +178,7 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
             name="client_name"
             value={formData.client_name}
             onChange={handleChange}
-            placeholder="например, Алексей Смирнов"
+            placeholder="Имя клиента или компания"
             required
           />
           <Input
@@ -161,6 +191,40 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
           />
         </div>
 
+        {/* 2 календаря: Период от и до */}
+        <div className="form-group">
+          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <IconCalendar size={14} />
+            <span>Срок оказания услуги (Период: С — По)</span>
+            <span style={{ color: '#ef4444' }}>*</span>
+          </label>
+          <div className="form-row" style={{ marginTop: 2 }}>
+            <div className="form-group">
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>От (Дата начала):</span>
+              <input
+                type="date"
+                name="period_start"
+                value={formData.period_start}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>До (Дата окончания):</span>
+              <input
+                type="date"
+                name="period_end"
+                min={formData.period_start || undefined}
+                value={formData.period_end}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="form-row">
           <Input
             label="Сумма к оплате (₸)"
@@ -170,7 +234,7 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
             min="0"
             value={formData.total_amount}
             onChange={handleChange}
-            placeholder="Полная стоимость услуги"
+            placeholder="Полная стоимость"
             required
           />
           <Input
@@ -182,19 +246,9 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
             value={formData.paid_amount}
             onChange={handleChange}
             placeholder="0"
-            helperText="Сколько клиент внес сейчас"
+            helperText="Сколько клиент оплатил"
           />
         </div>
-
-        <Input
-          label="Срок (период)"
-          name="period"
-          type="date"
-          value={formData.period}
-          onChange={handleChange}
-          placeholder="Выберите дату"
-          required
-        />
 
         <div className="form-group">
           <label className="form-label" htmlFor="task_description">
@@ -205,7 +259,7 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
             name="task_description"
             value={formData.task_description}
             onChange={handleChange}
-            placeholder="Подробно опишите, что именно требуется сделать для клиента..."
+            placeholder="Опишите суть работы или услуги..."
             required
             className="form-textarea"
           />
@@ -213,38 +267,32 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
 
         {/* Чекбокс завершения, если всё оплачено */}
         {debt === 0 && totalNum > 0 && (
-          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.88rem', userSelect: 'none' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontSize: '0.84rem', userSelect: 'none' }}>
             <input
               type="checkbox"
               name="is_completed"
               checked={formData.is_completed}
               onChange={handleChange}
-              style={{ width: 18, height: 18, cursor: 'pointer' }}
+              style={{ width: 17, height: 17, cursor: 'pointer' }}
             />
-            <span>Задача уже полностью выполнена (отправить сразу в <strong>Архив</strong>)</span>
+            <span>Задача выполнена (перенести в <strong>Архив</strong>)</span>
           </label>
         )}
 
-        {/* Автоматический расчет и превью статуса */}
+        {/* Автоматический расчет остатка и превью */}
         <div className="calc-preview">
           <div className="calc-preview-row">
-            <span>Расчетный остаток долга:</span>
+            <span>Остаток задолженности:</span>
             <strong style={{ color: debt > 0 ? '#dc2626' : '#16a34a', fontFamily: 'var(--font-mono)' }}>
               {formatCurrency(debt)}
             </strong>
           </div>
           <div className="calc-preview-row">
-            <span>Куда попадет запись:</span>
+            <span>Статус записи:</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Вкладка</span>
               <Badge status={projectedStatus} />
             </div>
           </div>
-          {debt > 0 && (
-            <div style={{ fontSize: '0.78rem', color: '#dc2626', marginTop: 4 }}>
-              * Оплачено меньше полной стоимости ➔ система автоматически зафиксирует статус «Долг».
-            </div>
-          )}
         </div>
       </form>
     </Modal>

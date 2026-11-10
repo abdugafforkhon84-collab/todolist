@@ -3,14 +3,14 @@ import { AuthProvider, useAuth } from './store/AuthContext';
 import { RecordProvider, useRecords } from './store/RecordContext';
 import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
+import { StatsBanner } from './components/StatsBanner';
 import { RecordsPage } from './pages/RecordsPage';
 import { DebtsPage } from './pages/DebtsPage';
 import { ArchivePage } from './pages/ArchivePage';
 import { LoginPage } from './pages/LoginPage';
 import { RecordModal } from './components/RecordModal';
 import { PaymentModal } from './components/PaymentModal';
-import { IconPlus, IconRecords, IconDebt, IconAlert, IconCheck } from './assets/icons';
-import { formatCurrency } from './utils/formatters';
+import { IconPlus } from './assets/icons';
 
 const DashboardContent = () => {
   const {
@@ -34,63 +34,25 @@ const DashboardContent = () => {
       <Navbar />
 
       <main className="main-content">
-        {/* Верхняя аналитическая панель (Dashboard Stats) */}
-        <section className="stats-banner">
-          <div className="stat-card">
-            <div className="stat-card-header">
-              <span className="stat-card-title">В работе (Активно)</span>
-              <div className="stat-card-icon-box icon-active">
-                <IconRecords size={16} />
-              </div>
-            </div>
-            <span className="stat-card-value">{stats.active_count}</span>
-          </div>
-
-          <div className="stat-card" style={{ borderColor: stats.debt_count > 0 ? '#fecdd3' : undefined }}>
-            <div className="stat-card-header">
-              <span className="stat-card-title">Клиентов с долгом</span>
-              <div className="stat-card-icon-box icon-debt">
-                <IconDebt size={16} />
-              </div>
-            </div>
-            <span className="stat-card-value debt-text">{stats.debt_count}</span>
-          </div>
-
-          <div className="stat-card" style={{ borderColor: stats.total_debt > 0 ? '#fecdd3' : undefined }}>
-            <div className="stat-card-header">
-              <span className="stat-card-title">Общий долг</span>
-              <div className="stat-card-icon-box icon-debt">
-                <IconAlert size={16} />
-              </div>
-            </div>
-            <span className="stat-card-value debt-text">{formatCurrency(stats.total_debt)}</span>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-card-header">
-              <span className="stat-card-title">Получено оплат</span>
-              <div className="stat-card-icon-box icon-revenue">
-                <IconCheck size={16} />
-              </div>
-            </div>
-            <span className="stat-card-value revenue-text">{formatCurrency(stats.total_revenue)}</span>
-          </div>
-        </section>
+        {/* Сводка аналитики: однострочный вид по умолчанию, при нажатии показывает карточки */}
+        <StatsBanner />
 
         {/* Экраны вкладок */}
         {activeTab === 'Записи' && <RecordsPage />}
         {activeTab === 'Долг' && <DebtsPage />}
         {activeTab === 'Архив' && <ArchivePage />}
 
-        {/* Плавающая кнопка добавления («+») в правом нижнем углу */}
-        <button
-          className="fab-btn"
-          onClick={handleOpenAddModal}
-          title="Добавить новую запись"
-          aria-label="Добавить запись"
-        >
-          <IconPlus size={24} />
-        </button>
+        {/* Плавающая кнопка («+») ТОЛЬКО во вкладке «Записи» */}
+        {activeTab === 'Записи' && (
+          <button
+            className="fab-btn"
+            onClick={handleOpenAddModal}
+            title="Добавить новую запись"
+            aria-label="Добавить новую запись"
+          >
+            <IconPlus size={22} />
+          </button>
+        )}
 
         {/* Модальное окно создания / редактирования записи */}
         <RecordModal

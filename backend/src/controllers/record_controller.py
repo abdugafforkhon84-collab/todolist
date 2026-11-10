@@ -54,8 +54,15 @@ def get_records(
     query = db.query(Record)
 
     if tab:
-        # Вкладки соответствуют статусам: 'Активно', 'Долг', 'Архив'
-        query = query.filter(Record.status == tab)
+        # Вкладка 'Записи' соответствует статусу 'Активно' в базе данных
+        if tab in ["Записи", "Активно"]:
+            query = query.filter(Record.status == "Активно")
+        elif tab == "Долг":
+            query = query.filter(Record.status == "Долг")
+        elif tab == "Архив":
+            query = query.filter(Record.status == "Архив")
+        else:
+            query = query.filter(Record.status == tab)
 
     if search:
         search_fmt = f"%{search.strip()}%"

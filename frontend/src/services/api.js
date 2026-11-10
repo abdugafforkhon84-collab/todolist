@@ -70,7 +70,10 @@ export const api = {
   // Записи клиентов
   async getRecords(tab = null, search = '') {
     const params = new URLSearchParams();
-    if (tab) params.append('tab', tab);
+    if (tab) {
+      const normalizedTab = tab === 'Записи' ? 'Активно' : tab;
+      params.append('tab', normalizedTab);
+    }
     if (search) params.append('search', search);
 
     const url = `${BASE_URL}/api/records${params.toString() ? `?${params.toString()}` : ''}`;

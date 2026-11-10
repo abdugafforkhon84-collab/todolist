@@ -43,7 +43,9 @@ export const RecordProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getRecords(activeTab, search);
+      // Вкладка 'Записи' в интерфейсе соответствует статусу 'Активно'
+      const tabParam = activeTab === 'Записи' ? 'Активно' : activeTab;
+      const data = await api.getRecords(tabParam, search);
       setRecords(data);
     } catch (err) {
       setError(err.message);
@@ -65,6 +67,14 @@ export const RecordProvider = ({ children }) => {
   // Создание новой записи
   const createRecord = async (recordData) => {
     const newRecord = await api.createRecord(recordData);
+    // Автоматически переключаем на вкладку созданной записи, чтобы пользователь сразу ее увидел
+    if (newRecord.status === 'Долг') {
+      setActiveTab('Долг');
+    } else if (newRecord.status === 'Архив') {
+      setActiveTab('Архив');
+    } else {
+      setActiveTab('Записи');
+    }
     await refreshData();
     return newRecord;
   };
