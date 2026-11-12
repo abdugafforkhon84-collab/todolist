@@ -1,40 +1,13 @@
 import React from 'react';
 import { useRecords } from '../store/RecordContext';
 import { RecordItem } from '../components/RecordItem';
-import { IconDebt, IconSearch, IconCheck, IconAlert } from '../assets/icons';
-import { formatCurrency } from '../utils/formatters';
+import { IconDebt, IconSearch, IconCheck } from '../assets/icons';
 
 export const DebtsPage = () => {
-  const { records, loading, search, setSearch, stats } = useRecords();
+  const { records, loading, search, setSearch } = useRecords();
 
   return (
     <div>
-      {/* Debt Summary Banner */}
-      <div className="debt-alert-banner">
-        <div className="debt-alert-left">
-          <div className="debt-alert-icon">
-            <IconAlert size={18} />
-          </div>
-          <div>
-            <div className="debt-alert-title">
-              Контроль задолженностей
-            </div>
-            <div className="debt-alert-desc">
-              Клиенты с частичной оплатой или долгом
-            </div>
-          </div>
-        </div>
-
-        <div className="debt-alert-amount-box">
-          <div className="debt-alert-amount-label">
-            Сумма к доплате
-          </div>
-          <div className="debt-alert-amount-val">
-            {formatCurrency(stats.total_debt)}
-          </div>
-        </div>
-      </div>
-
       {/* Toolbar */}
       <div className="toolbar">
         <div className="search-box">
