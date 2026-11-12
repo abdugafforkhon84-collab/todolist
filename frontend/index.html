@@ -24,12 +24,36 @@
     <div id="root"></div>
     <script type="module" src="/src/index.jsx"></script>
     <script>
-      // Регистрация Service Worker для PWA
+      // Регистрация Service Worker для PWA с автоматическим обновлением кеша
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then((reg) => console.log('CRM PWA Service Worker зарегистрирован:', reg.scope))
+            .then((registration) => {
+              console.log('CRM PWA Service Worker зарегистрирован:', registration.scope);
+              // Проверяем наличие новой версии сразу при загрузке
+              registration.update();
+
+              registration.onupdatefound = () => {
+                const installing = registration.installing;
+                if (installing) {
+                  installing.onstatechange = () => {
+                    if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('Доступна новая версия CRM, перезагружаем страницу...');
+                      window.location.reload();
+                    }
+                  };
+                }
+              };
+            })
             .catch((err) => console.log('Ошибка регистрации SW:', err));
+
+          let isReloading = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!isReloading) {
+              isReloading = true;
+              window.location.reload();
+            }
+          });
         });
       }
     </script>
