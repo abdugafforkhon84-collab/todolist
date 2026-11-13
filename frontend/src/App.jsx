@@ -3,7 +3,6 @@ import { AuthProvider, useAuth } from './store/AuthContext';
 import { RecordProvider, useRecords } from './store/RecordContext';
 import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
-import { StatsBanner } from './components/StatsBanner';
 import { RecordsPage } from './pages/RecordsPage';
 import { DebtsPage } from './pages/DebtsPage';
 import { ArchivePage } from './pages/ArchivePage';
@@ -34,9 +33,6 @@ const DashboardContent = () => {
       <Navbar />
 
       <main className="main-content">
-        {/* Сводка аналитики: однострочный вид по умолчанию, при нажатии показывает карточки */}
-        <StatsBanner />
-
         {/* Экраны вкладок */}
         {activeTab === 'Записи' && <RecordsPage />}
         {activeTab === 'Долг' && <DebtsPage />}
