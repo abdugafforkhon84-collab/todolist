@@ -69,7 +69,7 @@ export const Navbar = () => {
           >
             <IconDebt size={18} />
             <span>Долг</span>
-            <span className="nav-tab-badge" style={stats.debt_count > 0 ? { backgroundColor: '#dc2626', color: '#fff' } : {}}>
+            <span className={`nav-tab-badge ${stats.debt_count > 0 ? 'badge-has-debt' : ''}`}>
               {stats.debt_count}
             </span>
           </button>

@@ -68,14 +68,14 @@ export const PaymentModal = ({ isOpen, onClose, record }) => {
           </div>
         )}
 
-        <div style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)', padding: 16, borderRadius: 12, border: '1px solid #c7d2fe' }}>
-          <div style={{ fontSize: '0.78rem', color: '#6366f1', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px' }}>
+        <div style={{ background: '#fafafa', padding: 14, borderRadius: 10, border: '1px solid #e4e4e7' }}>
+          <div style={{ fontSize: '0.74rem', color: '#71717a', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.4px' }}>
             Клиент
           </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 2 }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2 }}>
             {record.client_name}
           </div>
-          <div style={{ display: 'flex', gap: 20, marginTop: 12, fontSize: '0.88rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: '0.85rem', flexWrap: 'wrap' }}>
             <div>Всего: <strong>{formatCurrency(record.total_amount)}</strong></div>
             <div>Оплачено: <strong style={{ color: '#059669' }}>{formatCurrency(record.paid_amount)}</strong></div>
             <div>Текущий долг: <strong style={{ color: '#e11d48' }}>{formatCurrency(currentDebt)}</strong></div>
