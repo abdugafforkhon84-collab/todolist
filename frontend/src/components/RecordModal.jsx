@@ -3,7 +3,7 @@ import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
-import { formatCurrency, calculateDebt } from '../utils/formatters';
+import { formatCurrency, calculateDebt, isPeriodExpired } from '../utils/formatters';
 import { useRecords } from '../store/RecordContext';
 import { IconCalendar } from '../assets/icons';
 
@@ -79,12 +79,15 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
   const paidNum = parseFloat(formData.paid_amount) || 0;
   const debt = calculateDebt(totalNum, paidNum);
 
-  // Вычисление предполагаемого статуса
+  // Вычисление предполагаемого статуса по правилу:
+  // Если срок еще не закончился -> 'Активно' даже при недоплате.
+  // Долг будет только после окончания срока, если не оплачено.
+  const isExpired = formData.period_end ? isPeriodExpired(formData.period_end) : false;
   let projectedStatus = 'Активно';
-  if (totalNum > 0 && paidNum < totalNum) {
-    projectedStatus = 'Долг';
-  } else if (formData.is_completed) {
+  if (formData.is_completed) {
     projectedStatus = 'Архив';
+  } else if (totalNum > 0 && paidNum < totalNum) {
+    projectedStatus = isExpired ? 'Долг' : 'Активно';
   } else {
     projectedStatus = 'Активно';
   }
@@ -282,15 +285,22 @@ export const RecordModal = ({ isOpen, onClose, initialData = null }) => {
         {/* Автоматический расчет остатка и превью */}
         <div className="calc-preview">
           <div className="calc-preview-row">
-            <span>Остаток задолженности:</span>
-            <strong style={{ color: debt > 0 ? '#dc2626' : '#16a34a', fontFamily: 'var(--font-mono)' }}>
+            <span>Остаток к оплате:</span>
+            <strong style={{ color: debt > 0 ? '#e11d48' : '#059669', fontFamily: 'var(--font-mono)' }}>
               {formatCurrency(debt)}
             </strong>
           </div>
           <div className="calc-preview-row">
             <span>Статус записи:</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <Badge status={projectedStatus} />
+              <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                {projectedStatus === 'Долг'
+                  ? 'Срок истек — есть задолженность'
+                  : totalNum > 0 && paidNum < totalNum
+                  ? 'Срок еще идет — запись будет в «Активно»'
+                  : 'Оплачено полностью'}
+              </span>
             </div>
           </div>
         </div>

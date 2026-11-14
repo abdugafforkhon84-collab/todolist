@@ -11,9 +11,14 @@ import {
   IconAlert,
   IconDollar,
   IconChevronDown,
-  IconChevronUp,
 } from '../assets/icons';
-import { formatCurrency, calculateDebt } from '../utils/formatters';
+import {
+  formatCurrency,
+  calculateDebt,
+  isPeriodExpired,
+  getPeriodDaysRemaining,
+  getInitials,
+} from '../utils/formatters';
 import { useRecords } from '../store/RecordContext';
 
 export const RecordItem = ({ record }) => {
@@ -29,6 +34,9 @@ export const RecordItem = ({ record }) => {
   } = useRecords();
 
   const debt = calculateDebt(record.total_amount, record.paid_amount);
+  const isExpired = isPeriodExpired(record.period);
+  const daysRemaining = getPeriodDaysRemaining(record.period);
+  const initials = getInitials(record.client_name);
 
   const handleEdit = (e) => {
     e.stopPropagation();
@@ -58,9 +66,17 @@ export const RecordItem = ({ record }) => {
     restoreFromArchive(record.id);
   };
 
+  // Выбор цветовой схемы аватара по статусу
+  const avatarClass =
+    record.status === 'Долг'
+      ? 'avatar-debt'
+      : record.status === 'Архив'
+      ? 'avatar-archive'
+      : 'avatar-active';
+
   return (
     <div
-      className={`record-card ${isExpanded ? 'is-expanded' : 'is-collapsed'}`}
+      className={`record-card ${isExpanded ? 'is-expanded' : 'is-collapsed'} ${record.status === 'Долг' ? 'card-status-debt' : ''}`}
       onClick={() => setIsExpanded((prev) => !prev)}
       role="button"
       tabIndex={0}
@@ -73,109 +89,142 @@ export const RecordItem = ({ record }) => {
         }
       }}
     >
-      {/* Строка заголовка (компактный строчный вид) */}
+      {/* Строка заголовка карточки */}
       <div className="record-header">
-        <div className="record-title-group">
-          <h3 className="client-name">{record.client_name}</h3>
-          <Badge status={record.status} />
+        <div className="record-client-info">
+          {/* Аватар с инициалами */}
+          <div className={`client-avatar ${avatarClass}`} aria-hidden="true">
+            {initials}
+          </div>
+
+          <div className="client-text-group">
+            <div className="client-name-row">
+              <h3 className="client-name" title={record.client_name}>
+                {record.client_name}
+              </h3>
+              <Badge status={record.status} />
+            </div>
+
+            {/* Подстрочник в свернутом виде для мгновенной информации */}
+            <div className="client-subline">
+              <span className="subline-item subline-phone">{record.phone_number}</span>
+              {record.period && (
+                <>
+                  <span className="subline-dot">•</span>
+                  <span className="subline-item subline-period">{record.period}</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Правый блок строки: краткий статус суммы и кнопка раскрытия */}
         <div className="record-header-right">
-          {debt > 0 ? (
-            <span className="record-row-debt" title="Остаток долга">
-              <span className="record-row-debt-label">Долг:</span> {formatCurrency(debt)}
-            </span>
-          ) : (
-            <span className="record-row-paid" title="Оплачено полностью">
-              {formatCurrency(record.total_amount)}
-            </span>
-          )}
+          <div className="record-price-block">
+            {record.status === 'Долг' ? (
+              <div className="price-debt-wrap">
+                <span className="price-badge-label">ДОЛГ</span>
+                <span className="price-debt-value">{formatCurrency(debt)}</span>
+              </div>
+            ) : debt > 0 ? (
+              <div className="price-active-wrap">
+                <span className="price-main-value">{formatCurrency(record.total_amount)}</span>
+                <span className="price-sub-remain">остаток {formatCurrency(debt)}</span>
+              </div>
+            ) : (
+              <div className="price-paid-wrap">
+                <span className="price-paid-value">{formatCurrency(record.total_amount)}</span>
+                <span className="price-sub-paid">оплачено</span>
+              </div>
+            )}
+          </div>
 
-          {/* Иконки быстрого редактирования/удаления (видны при раскрытии или наведении) */}
-          {isExpanded && (
-            <div className="record-header-actions" onClick={(e) => e.stopPropagation()}>
-              <button
-                type="button"
-                className="btn-icon"
-                onClick={handleEdit}
-                title="Редактировать запись"
-                aria-label="Редактировать"
-              >
-                <IconEdit size={15} />
-              </button>
-              <button
-                type="button"
-                className="btn-icon btn-icon-delete"
-                onClick={handleDelete}
-                title="Удалить запись"
-                aria-label="Удалить"
-              >
-                <IconTrash size={15} />
-              </button>
-            </div>
-          )}
-
-          <span className="record-expand-arrow" aria-hidden="true">
-            {isExpanded ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
+          <span className={`record-chevron-btn ${isExpanded ? 'is-rotated' : ''}`} aria-hidden="true">
+            <IconChevronDown size={18} />
           </span>
         </div>
       </div>
 
-      {/* Развернутая информация о записи (показывается при нажатии) */}
+      {/* Развернутая информация о записи */}
       {isExpanded && (
         <div className="record-body animate-fade-in" onClick={(e) => e.stopPropagation()}>
-          {/* Мета-информация: Телефон и Период (от и до) */}
-          <div className="client-meta">
+          {/* Плашки: Телефон и Срок с интерактивным статусом */}
+          <div className="card-chips-row">
             <a
               href={`tel:${record.phone_number}`}
-              className="meta-item meta-item-phone"
+              className="info-chip chip-phone"
               title="Позвонить клиенту"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconPhone size={13} />
-              <span>{record.phone_number}</span>
+              <IconPhone size={14} className="chip-icon" />
+              <span className="chip-text">{record.phone_number}</span>
+              <span className="chip-badge-hint">Звонок</span>
             </a>
+
             {record.period && (
-              <div className="meta-item" title="Период оказания услуг">
-                <IconCalendar size={13} />
-                <span>{record.period}</span>
+              <div className="info-chip chip-period" title="Срок оказания услуг">
+                <IconCalendar size={14} className="chip-icon" />
+                <span className="chip-text">{record.period}</span>
+                {daysRemaining !== null && (
+                  <span
+                    className={`deadline-badge ${
+                      daysRemaining < 0
+                        ? 'deadline-overdue'
+                        : daysRemaining <= 2
+                        ? 'deadline-urgent'
+                        : 'deadline-normal'
+                    }`}
+                  >
+                    {daysRemaining < 0
+                      ? 'Срок истек'
+                      : daysRemaining === 0
+                      ? 'Срок сегодня'
+                      : `Осталось ${daysRemaining} дн.`}
+                  </span>
+                )}
               </div>
             )}
           </div>
 
           {/* Описание задачи */}
           {record.task_description && (
-            <div className="task-description">
-              {record.task_description}
+            <div className="card-task-box">
+              <span className="task-box-label">Задача / Описание</span>
+              <p className="task-box-text">{record.task_description}</p>
             </div>
           )}
 
-
-          {/* Финансовый блок: Сумма, Оплачено, Долг */}
-          <div className="finance-row">
-            <div className="finance-numbers">
-              <div className="finance-item">
-                <span className="finance-label">Сумма</span>
-                <span className="finance-val">{formatCurrency(record.total_amount)}</span>
-              </div>
-
-              <div className="finance-item">
-                <span className="finance-label">Оплачено</span>
-                <span className="finance-val paid">{formatCurrency(record.paid_amount)}</span>
-              </div>
-
-              <div className="finance-item">
-                <span className="finance-label">Остаток долга</span>
-                <span className={`finance-val ${debt > 0 ? 'debt' : ''}`}>
-                  {debt > 0 && <IconAlert size={14} />}
-                  {formatCurrency(debt)}
-                </span>
-              </div>
+          {/* Финансовые плитки (3 блока) */}
+          <div className="finance-tiles-grid">
+            <div className="finance-tile">
+              <span className="tile-label">Сумма заказа</span>
+              <span className="tile-value">{formatCurrency(record.total_amount)}</span>
             </div>
 
-            {/* Кнопки действий */}
-            <div className="record-actions">
+            <div className="finance-tile tile-paid">
+              <span className="tile-label">Оплачено</span>
+              <span className="tile-value value-paid">{formatCurrency(record.paid_amount)}</span>
+            </div>
+
+            <div className={`finance-tile ${debt > 0 ? 'tile-debt' : 'tile-cleared'}`}>
+              <span className="tile-label">
+                {record.status === 'Долг'
+                  ? 'Сумма долга'
+                  : debt > 0
+                  ? 'Остаток к оплате'
+                  : 'Остаток долга'}
+              </span>
+              <span className={`tile-value ${debt > 0 ? 'value-debt' : 'value-cleared'}`}>
+                {debt > 0 && <IconAlert size={14} />}
+                {formatCurrency(debt)}
+              </span>
+            </div>
+          </div>
+
+          {/* Нижняя панель действий */}
+          <div className="card-footer-actions">
+            {/* Основные действия статуса (Внести доплату / В архив / Восстановить) */}
+            <div className="primary-actions">
               {debt > 0 && (
                 <Button
                   variant="primary"
@@ -208,6 +257,28 @@ export const RecordItem = ({ record }) => {
                   Восстановить
                 </Button>
               )}
+            </div>
+
+            {/* Вспомогательные действия (Редактировать / Удалить) */}
+            <div className="manage-actions">
+              <button
+                type="button"
+                className="action-btn-pill action-edit"
+                onClick={handleEdit}
+                title="Редактировать запись"
+              >
+                <IconEdit size={14} />
+                <span>Изменить</span>
+              </button>
+              <button
+                type="button"
+                className="action-btn-pill action-delete"
+                onClick={handleDelete}
+                title="Удалить запись"
+              >
+                <IconTrash size={14} />
+                <span>Удалить</span>
+              </button>
             </div>
           </div>
         </div>

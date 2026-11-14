@@ -570,211 +570,533 @@ body {
 
 .record-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 16px 20px;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
 }
 
-/* Строчный компактный вид (по умолчанию) */
+.record-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.07);
+}
+
 .record-card.is-collapsed {
-  padding: 12px 16px;
   cursor: pointer;
-  gap: 0;
 }
 
 .record-card.is-collapsed:hover {
-  border-color: var(--primary-border);
-  box-shadow: var(--shadow-md);
-  background-color: #fafafa;
+  background-color: #fbfcfe;
+  transform: translateY(-1px);
 }
 
-/* Развернутый подробный вид (при клике) */
 .record-card.is-expanded {
-  padding: 16px 18px;
-  gap: 12px;
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-border);
+  padding: 16px 20px;
+  border-color: #c7d2fe;
+  box-shadow: 0 10px 25px -3px rgba(79, 70, 229, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
+.record-card.card-status-debt {
+  border-color: #fecdd3;
+}
 
+.record-card.card-status-debt.is-expanded {
+  border-color: #fda4af;
+  box-shadow: 0 10px 25px -3px rgba(244, 63, 94, 0.08);
+}
+
+/* Card Header */
 .record-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
-.record-title-group {
+.record-client-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
   flex: 1;
 }
 
+/* Client Avatar with Initials */
+.client-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: -0.3px;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.record-card:hover .client-avatar {
+  transform: scale(1.05);
+}
+
+.client-avatar.avatar-active {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.client-avatar.avatar-debt {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+}
+
+.client-avatar.avatar-archive {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.client-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.client-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
 .client-name {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.2px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+.client-subline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #64748b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.subline-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.subline-phone {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.subline-dot {
+  color: #cbd5e1;
+  font-size: 0.7rem;
+}
+
+.subline-period {
+  color: #64748b;
+}
+
+/* Header Right Area */
 .record-header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
-.record-row-debt {
-  font-size: 0.88rem;
-  font-weight: 700;
+.record-price-block {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.price-debt-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.price-badge-label {
+  font-size: 0.65rem;
+  font-weight: 800;
   color: #e11d48;
-  font-family: var(--font-mono);
-  white-space: nowrap;
-}
-
-.record-row-debt-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-right: 3px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
+  background: #ffe4e6;
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.2;
 }
 
-.record-row-paid {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #059669;
+.price-debt-value {
+  font-size: 1.05rem;
+  font-weight: 800;
   font-family: var(--font-mono);
-  white-space: nowrap;
+  color: #e11d48;
+  letter-spacing: -0.3px;
 }
 
-.record-expand-arrow {
+.price-active-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.price-main-value {
+  font-size: 1.02rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.price-sub-remain {
+  font-size: 0.72rem;
+  color: #d97706;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.price-paid-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.price-paid-value {
+  font-size: 1.02rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #059669;
+  letter-spacing: -0.3px;
+}
+
+.price-sub-paid {
+  font-size: 0.7rem;
+  color: #059669;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+/* Chevron expand button */
+.record-chevron-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  transition: transform 0.2s ease, color 0.15s ease;
+  color: #94a3b8;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
-.record-card:hover .record-expand-arrow {
+.record-card:hover .record-chevron-btn {
   color: var(--primary);
+  background: var(--primary-light);
+  border-color: var(--primary-border);
 }
 
+.record-chevron-btn.is-rotated {
+  transform: rotate(180deg);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* Expanded Card Body */
 .record-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  border-top: 1px dashed var(--border-color);
-  padding-top: 12px;
-  margin-top: 4px;
+  gap: 14px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+  margin-top: 10px;
 }
 
-.client-meta {
+/* Info Chips Row */
+.card-chips-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 0.86rem;
-  color: var(--text-secondary);
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.meta-item {
-  display: flex;
+.info-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
+  gap: 7px;
+  padding: 6px 12px;
   background: #f8fafc;
-  border-radius: var(--radius-sm);
-  border: 1px solid #f1f5f9;
-  transition: background 0.15s ease, color 0.15s ease;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.15s ease;
 }
 
-.meta-item:hover {
+.info-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.chip-phone {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.chip-phone:hover {
   background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary-border);
+}
+
+.chip-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.chip-phone:hover .chip-icon {
   color: var(--primary);
 }
 
-.task-description {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: var(--radius-md);
+.chip-badge-hint {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #e0e7ff;
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  font-family: var(--font-sans);
+}
+
+/* Deadline Badges */
+.deadline-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+  margin-left: 2px;
+}
+
+.deadline-normal {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.deadline-urgent {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.deadline-overdue {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Task Box */
+.card-task-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   padding: 12px 16px;
-  font-size: 0.94rem;
-  color: var(--text-primary);
-  line-height: 1.5;
-  border-left: 3px solid var(--primary);
-}
-
-/* Financial Bars & Details */
-.finance-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding-top: 12px;
-  border-top: 1px solid #f1f5f9;
-  flex-wrap: wrap;
-}
-
-.finance-numbers {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.finance-item {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
-.finance-label {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.task-box-label {
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
 }
 
-.finance-val {
+.task-box-text {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+/* Finance Tiles Grid */
+.finance-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.finance-tile {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: all 0.15s ease;
+}
+
+.finance-tile:hover {
+  background: #f1f5f9;
+}
+
+.tile-paid {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.tile-paid:hover {
+  background: #dcfce7;
+}
+
+.tile-debt {
+  background: #fff1f2;
+  border-color: #ffe4e6;
+}
+
+.tile-debt:hover {
+  background: #ffe4e6;
+}
+
+.tile-cleared {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.tile-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.tile-paid .tile-label {
+  color: #166534;
+}
+
+.tile-debt .tile-label {
+  color: #9f1239;
+}
+
+.tile-value {
   font-size: 1.15rem;
   font-weight: 800;
   font-family: var(--font-mono);
   color: var(--text-primary);
-}
-
-.finance-val.debt {
-  color: #e11d48;
+  letter-spacing: -0.3px;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.finance-val.paid {
+.tile-value.value-paid {
   color: #059669;
 }
 
+.tile-value.value-debt {
+  color: #e11d48;
+}
 
-/* Action Buttons */
-.record-actions {
+.tile-value.value-cleared {
+  color: #64748b;
+}
+
+/* Footer Actions */
+.card-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.primary-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.manage-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.action-btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn-pill:hover {
+  background: #f8fafc;
+  color: var(--text-primary);
+  border-color: #cbd5e1;
+}
+
+.action-edit:hover {
+  color: var(--primary);
+  border-color: var(--primary-border);
+  background: var(--primary-light);
+}
+
+.action-delete:hover {
+  color: #e11d48;
+  border-color: #fecdd3;
+  background: #fff1f2;
 }
 
 /* Status Badges */
@@ -1504,116 +1826,102 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
   /* Compact Record Cards */
   .records-grid {
-    gap: 8px;
+    gap: 10px;
   }
 
   .record-card {
-    border-radius: 12px;
-  }
-
-  .record-card.is-collapsed {
-    padding: 10px 12px;
+    border-radius: 14px;
+    padding: 12px 14px;
   }
 
   .record-card.is-expanded {
-    padding: 12px 14px;
+    padding: 14px 14px;
     gap: 10px;
   }
 
-  .record-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
+  .client-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 0.85rem;
+    border-radius: 10px;
   }
 
   .client-name {
+    font-size: 0.95rem;
+    max-width: 140px;
+  }
+
+  .client-subline {
+    font-size: 0.72rem;
+  }
+
+  .price-debt-value,
+  .price-main-value,
+  .price-paid-value {
     font-size: 0.92rem;
-    font-weight: 700;
   }
 
-  .record-row-debt {
-    font-size: 0.84rem;
+  .card-chips-row {
+    gap: 6px;
   }
 
-  .record-row-paid {
-    font-size: 0.84rem;
-  }
-
-  .record-body {
-    gap: 10px;
-    padding-top: 10px;
-    margin-top: 2px;
-  }
-
-  .client-meta {
-    gap: 8px;
-    font-size: 0.74rem;
-    margin-top: 2px;
-  }
-
-  .meta-item {
-    font-size: 0.74rem;
-    gap: 3px;
-  }
-
-  .meta-item svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .task-description {
+  .info-chip {
+    padding: 5px 10px;
     font-size: 0.78rem;
-    line-height: 1.35;
-    padding: 6px 8px;
-    border-radius: 6px;
-    margin: 0;
   }
 
-  /* 3-Column Compact Finance Row */
-  .finance-row {
-    flex-direction: column;
-    gap: 8px;
+  .card-task-box {
+    padding: 10px 12px;
   }
 
-  .finance-numbers {
+  .task-box-text {
+    font-size: 0.85rem;
+  }
+
+  /* 3-Column Compact Finance Tiles */
+  .finance-tiles-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 5px;
-    width: 100%;
+    gap: 6px;
   }
 
-  .finance-item {
-    padding: 5px 6px;
-    background: #f8fafc;
-    border-radius: 6px;
-    border: 1px solid #f1f5f9;
+  .finance-tile {
+    padding: 6px 8px;
+    border-radius: 8px;
   }
 
-  .finance-label {
-    font-size: 0.6rem;
-    line-height: 1.1;
+  .tile-label {
+    font-size: 0.62rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .finance-val {
-    font-size: 0.78rem;
-    font-weight: 700;
-    line-height: 1.2;
+  .tile-value {
+    font-size: 0.82rem;
     white-space: nowrap;
   }
 
-  .record-actions {
-    display: flex;
-    gap: 6px;
+  .card-footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .primary-actions {
     width: 100%;
   }
 
-  .record-actions .btn {
+  .primary-actions .btn {
     flex: 1;
-    height: 32px;
-    padding: 4px 8px;
-    font-size: 0.74rem;
-    border-radius: 6px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+
+  .manage-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   /* Floating Action Button (above bottom nav) */
