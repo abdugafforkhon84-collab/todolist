@@ -29,10 +29,6 @@ export const RecordItem = ({ record }) => {
   } = useRecords();
 
   const debt = calculateDebt(record.total_amount, record.paid_amount);
-  const paidPercent =
-    record.total_amount > 0
-      ? Math.min(100, Math.round((record.paid_amount / record.total_amount) * 100))
-      : 100;
 
   const handleEdit = (e) => {
     e.stopPropagation();
@@ -62,17 +58,9 @@ export const RecordItem = ({ record }) => {
     restoreFromArchive(record.id);
   };
 
-  // Border indicator class depending on status
-  const borderClass =
-    record.status === 'Долг'
-      ? 'debt-border'
-      : record.status === 'Архив'
-      ? 'archive-border'
-      : 'active-border';
-
   return (
     <div
-      className={`record-card ${borderClass} ${isExpanded ? 'is-expanded' : 'is-collapsed'}`}
+      className={`record-card ${isExpanded ? 'is-expanded' : 'is-collapsed'}`}
       onClick={() => setIsExpanded((prev) => !prev)}
       role="button"
       tabIndex={0}
@@ -163,21 +151,6 @@ export const RecordItem = ({ record }) => {
             </div>
           )}
 
-          {/* Прогресс-бар оплаты */}
-          <div className="progress-section">
-            <div className="progress-labels">
-              <span className="progress-title">Оплата</span>
-              <span className={`progress-percent ${debt === 0 ? 'paid' : 'debt'}`}>
-                {paidPercent}%
-              </span>
-            </div>
-            <div className="progress-bar-container" title={`Оплачено: ${paidPercent}%`}>
-              <div
-                className={`progress-bar-fill ${debt === 0 ? 'fully-paid' : 'has-debt'}`}
-                style={{ width: `${paidPercent}%` }}
-              />
-            </div>
-          </div>
 
           {/* Финансовый блок: Сумма, Оплачено, Долг */}
           <div className="finance-row">

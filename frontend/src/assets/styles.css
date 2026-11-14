@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
@@ -602,17 +602,6 @@ body {
   border-color: var(--primary-border);
 }
 
-.record-card.active-border {
-  border-left: 4px solid #10b981;
-}
-
-.record-card.debt-border {
-  border-left: 4px solid #f43f5e;
-}
-
-.record-card.archive-border {
-  border-left: 4px solid #64748b;
-}
 
 .record-header {
   display: flex;
@@ -779,31 +768,6 @@ body {
   color: #059669;
 }
 
-/* Payment Progress Bar */
-.progress-bar-container {
-  width: 100%;
-  background-color: #f1f5f9;
-  height: 9px;
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-top: -6px;
-  border: 1px solid #e2e8f0;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: var(--primary-gradient);
-  transition: width 0.4s ease;
-  border-radius: 9999px;
-}
-
-.progress-bar-fill.fully-paid {
-  background: var(--success-gradient);
-}
-
-.progress-bar-fill.has-debt {
-  background: var(--danger-gradient);
-}
 
 /* Action Buttons */
 .record-actions {
