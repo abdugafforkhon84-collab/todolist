@@ -30,11 +30,8 @@ export const RecordsPage = () => {
 
         <div className="toolbar-actions-row">
           <span className="records-count-info">
-            Активных: <strong>{records.length}</strong>
+            Активных записей: <strong>{records.length}</strong>
           </span>
-          <Button variant="primary" size="sm" onClick={handleAddNew} icon={<IconPlus size={15} />}>
-            Новая запись
-          </Button>
         </div>
       </div>
 
