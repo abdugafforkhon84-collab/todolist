@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, desc
 from fastapi import HTTPException, status
 from ..models.record import Record
-from ..schemas.record import RecordCreate, RecordUpdate, RecordPayment, RecordStats
 
 RU_MONTHS = {
     "январ": 1, "феврал": 2, "март": 3, "апрел": 4, "ма": 5, "июн": 6,
@@ -14,19 +13,12 @@ RU_MONTHS = {
 }
 
 def parse_period_end_date(period_str: Optional[str]) -> Optional[date]:
-    """
-    Извлекает дату окончания периода из строки любого распространенного формата:
-    - YYYY-MM-DD или YYYY-MM-DD — YYYY-MM-DD
-    - DD.MM.YYYY или DD.MM.YYYY — DD.MM.YYYY
-    - Названия месяцев на русском, например 'Ноябрь 2026' или '20 ноября 2026'
-    """
     if not period_str:
         return None
     s = period_str.strip()
     if not s:
         return None
 
-    # 1. Поиск дат в формате YYYY-MM-DD
     iso_matches = re.findall(r'\b(\d{4})-(\d{1,2})-(\d{1,2})\b', s)
     if iso_matches:
         y, m, d = iso_matches[-1]
@@ -35,7 +27,6 @@ def parse_period_end_date(period_str: Optional[str]) -> Optional[date]:
         except ValueError:
             pass
 
-    # 2. Поиск дат в формате DD.MM.YYYY
     dot_matches = re.findall(r'\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b', s)
     if dot_matches:
         d, m, y = dot_matches[-1]
@@ -44,7 +35,6 @@ def parse_period_end_date(period_str: Optional[str]) -> Optional[date]:
         except ValueError:
             pass
 
-    # 3. Русские месяцы, например 'Ноябрь 2026'
     s_lower = s.lower()
     for prefix, m_num in RU_MONTHS.items():
         if prefix in s_lower:
@@ -65,11 +55,6 @@ def parse_period_end_date(period_str: Optional[str]) -> Optional[date]:
     return None
 
 def is_period_expired(period_str: Optional[str]) -> bool:
-    """
-    Проверяет, истек ли срок оказания услуг / выполнения задачи.
-    До наступления конца даты (включая саму дату окончания) возвращает False.
-    После наступления следующего дня возвращает True.
-    """
     end_date = parse_period_end_date(period_str)
     if not end_date:
         return False
@@ -83,32 +68,22 @@ def calculate_status(
     is_completed: bool = False,
     current_status: Optional[str] = None
 ) -> str:
-    """
-    Бизнес-логика распределения статуса:
-    1. Если задача в архиве или завершена -> 'Архив'.
-    2. Если оплачено полностью (paid_amount >= total_amount) -> 'Активно'.
-    3. Если есть недоплата (paid_amount < total_amount):
-       - До окончания срока (пока срок не истек) -> 'Активно' (даже при недоплате).
-       - После окончания срока (срок истек, а оплата не закрыта) -> 'Долг'.
-    """
     if is_completed or current_status == "Архив":
         return "Архив"
 
     if paid_amount >= total_amount:
         return "Активно"
 
-    # Есть недоплата: статус зависит от срока
     if is_period_expired(period):
         return "Долг"
     else:
         return "Активно"
 
-def sync_records_status(db: Session) -> None:
-    """
-    Автоматическая актуализация статусов (Активно / Долг) с учетом текущей даты.
-    Архивные записи не затрагиваются.
-    """
-    records = db.query(Record).filter(Record.status.in_(["Активно", "Долг"])).all()
+def sync_records_status(db: Session, user_id: Optional[int] = None) -> None:
+    query = db.query(Record).filter(Record.status.in_(["Активно", "Долг"]))
+    if user_id is not None:
+        query = query.filter(Record.user_id == user_id)
+    records = query.all()
     changed = False
     for r in records:
         target_status = calculate_status(
@@ -124,7 +99,8 @@ def sync_records_status(db: Session) -> None:
     if changed:
         db.commit()
 
-def create_record(db: Session, record_in: RecordCreate) -> Record:
+def create_record(db: Session, record_in, user_id: Optional[int] = None) -> Record:
+    from ..schemas.record import RecordCreate
     auto_status = calculate_status(
         total_amount=record_in.total_amount,
         paid_amount=record_in.paid_amount,
@@ -133,6 +109,7 @@ def create_record(db: Session, record_in: RecordCreate) -> Record:
     )
     
     db_record = Record(
+        user_id=user_id,
         client_name=record_in.client_name.strip(),
         phone_number=record_in.phone_number.strip(),
         total_amount=round(record_in.total_amount, 2),
@@ -150,18 +127,20 @@ def create_record(db: Session, record_in: RecordCreate) -> Record:
 
 def get_records(
     db: Session,
+    user_id: Optional[int] = None,
     tab: Optional[str] = None,
     search: Optional[str] = None,
     skip: int = 0,
     limit: int = 100
 ) -> List[Record]:
-    # Актуализируем статусы с учетом текущей даты и сроков
-    sync_records_status(db)
+    sync_records_status(db, user_id=user_id)
 
     query = db.query(Record)
+    
+    if user_id is not None:
+        query = query.filter(Record.user_id == user_id)
 
     if tab:
-        # Вкладка 'Записи' соответствует статусу 'Активно' в базе данных
         if tab in ["Записи", "Активно"]:
             query = query.filter(Record.status == "Активно")
         elif tab == "Долг":
@@ -184,8 +163,11 @@ def get_records(
 
     return query.order_by(desc(Record.updated_at)).offset(skip).limit(limit).all()
 
-def get_record_by_id(db: Session, record_id: int) -> Record:
-    rec = db.query(Record).filter(Record.id == record_id).first()
+def get_record_by_id(db: Session, record_id: int, user_id: Optional[int] = None) -> Record:
+    query = db.query(Record).filter(Record.id == record_id)
+    if user_id is not None:
+        query = query.filter(Record.user_id == user_id)
+    rec = query.first()
     if not rec:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -193,8 +175,8 @@ def get_record_by_id(db: Session, record_id: int) -> Record:
         )
     return rec
 
-def update_record(db: Session, record_id: int, record_in: RecordUpdate) -> Record:
-    db_record = get_record_by_id(db, record_id)
+def update_record(db: Session, record_id: int, record_in, user_id: Optional[int] = None) -> Record:
+    db_record = get_record_by_id(db, record_id, user_id=user_id)
 
     update_data = record_in.model_dump(exclude_unset=True)
 
@@ -212,7 +194,6 @@ def update_record(db: Session, record_id: int, record_in: RecordUpdate) -> Recor
     if "paid_amount" in update_data and update_data["paid_amount"] is not None:
         db_record.paid_amount = round(update_data["paid_amount"], 2)
 
-    # Пересчет статуса
     manual_status = update_data.get("status")
     if manual_status:
         if manual_status == "Архив":
@@ -226,7 +207,6 @@ def update_record(db: Session, record_id: int, record_in: RecordUpdate) -> Recor
                 current_status=manual_status
             )
     else:
-        # Автоматический пересчет по срокам и оплате
         db_record.status = calculate_status(
             total_amount=float(db_record.total_amount),
             paid_amount=float(db_record.paid_amount),
@@ -240,14 +220,8 @@ def update_record(db: Session, record_id: int, record_in: RecordUpdate) -> Recor
     db.refresh(db_record)
     return db_record
 
-def add_payment(db: Session, record_id: int, payment_in: RecordPayment) -> Record:
-    """
-    Внесение доплаты:
-    Увеличивает paid_amount на указанную сумму.
-    При полной оплате переносится в Архив (если срок истек) или остается в Активно.
-    При остатке долга: Долг (если срок истек) или Активно (если срок еще идет).
-    """
-    db_record = get_record_by_id(db, record_id)
+def add_payment(db: Session, record_id: int, payment_in, user_id: Optional[int] = None) -> Record:
+    db_record = get_record_by_id(db, record_id, user_id=user_id)
 
     current_paid = float(db_record.paid_amount or 0.0)
     current_total = float(db_record.total_amount or 0.0)
@@ -271,18 +245,21 @@ def add_payment(db: Session, record_id: int, payment_in: RecordPayment) -> Recor
     db.refresh(db_record)
     return db_record
 
-def delete_record(db: Session, record_id: int) -> bool:
-    db_record = get_record_by_id(db, record_id)
+def delete_record(db: Session, record_id: int, user_id: Optional[int] = None) -> bool:
+    db_record = get_record_by_id(db, record_id, user_id=user_id)
     db.delete(db_record)
     db.commit()
     return True
 
-def get_statistics(db: Session) -> RecordStats:
-    # Актуализируем статусы перед подсчетом статистики
-    sync_records_status(db)
+def get_statistics(db: Session, user_id: Optional[int] = None):
+    sync_records_status(db, user_id=user_id)
 
-    all_records = db.query(Record).all()
+    query = db.query(Record)
+    if user_id is not None:
+        query = query.filter(Record.user_id == user_id)
+    all_records = query.all()
     
+    from ..schemas.record import RecordStats
     total_records = len(all_records)
     active_count = sum(1 for r in all_records if r.status == "Активно")
     debt_count = sum(1 for r in all_records if r.status == "Долг")

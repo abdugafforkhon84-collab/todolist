@@ -1,18 +1,19 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, Numeric, DateTime
+from sqlalchemy import Column, Integer, String, Text, Numeric, DateTime, ForeignKey
 from ..config.db import Base
 
 class Record(Base):
     __tablename__ = "records"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     client_name = Column(String(255), nullable=False, index=True)
     phone_number = Column(String(50), nullable=False)
     total_amount = Column(Numeric(12, 2), nullable=False)
     paid_amount = Column(Numeric(12, 2), nullable=False, default=0.00)
     period = Column(String(100), nullable=False)
     task_description = Column(Text, nullable=False)
-    status = Column(String(20), nullable=False, index=True)  # 'Активно', 'Долг', 'Архив'
+    status = Column(String(20), nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

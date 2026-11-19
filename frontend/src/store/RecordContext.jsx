@@ -5,9 +5,11 @@ import { useAuth } from './AuthContext';
 const RecordContext = createContext(null);
 
 export const RecordProvider = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
-  const [activeTab, setActiveTab] = useState('Записи'); // 'Записи', 'Долг', 'Архив'
+  // Для admin — начальная вкладка "Пользователи", для user — "Записи"
+  const [activeTab, setActiveTab] = useState(isAdmin ? 'Пользователи' : 'Записи');
   const [records, setRecords] = useState([]);
   const [stats, setStats] = useState({
     total_records: 0,
@@ -26,24 +28,23 @@ export const RecordProvider = ({ children }) => {
   const [editingRecord, setEditingRecord] = useState(null);
   const [payingRecord, setPayingRecord] = useState(null);
 
-  // Загрузка статистики
+  // Загрузка статистики (только для обычных пользователей)
   const loadStats = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || isAdmin) return;
     try {
       const statsData = await api.getStats();
       setStats(statsData);
     } catch (err) {
       console.error('Ошибка загрузки статистики:', err);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAdmin]);
 
   // Загрузка записей для текущей вкладки
   const loadRecords = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || isAdmin) return;
     setLoading(true);
     setError(null);
     try {
-      // Вкладка 'Записи' в интерфейсе соответствует статусу 'Активно'
       const tabParam = activeTab === 'Записи' ? 'Активно' : activeTab;
       const data = await api.getRecords(tabParam, search);
       setRecords(data);
@@ -52,22 +53,21 @@ export const RecordProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, activeTab, search]);
+  }, [isAuthenticated, isAdmin, activeTab, search]);
 
   const refreshData = useCallback(async () => {
     await Promise.all([loadRecords(), loadStats()]);
   }, [loadRecords, loadStats]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isAdmin) {
       refreshData();
     }
-  }, [isAuthenticated, activeTab, search, refreshData]);
+  }, [isAuthenticated, isAdmin, activeTab, search, refreshData]);
 
   // Создание новой записи
   const createRecord = async (recordData) => {
     const newRecord = await api.createRecord(recordData);
-    // Автоматически переключаем на вкладку созданной записи, чтобы пользователь сразу ее увидел
     if (newRecord.status === 'Долг') {
       setActiveTab('Долг');
     } else if (newRecord.status === 'Архив') {
@@ -99,13 +99,13 @@ export const RecordProvider = ({ children }) => {
     await refreshData();
   };
 
-  // Перевод в архив (выполнено обязательство)
+  // Перевод в архив
   const moveToArchive = async (id) => {
     await api.updateRecord(id, { status: 'Архив' });
     await refreshData();
   };
 
-  // Возврат из архива в активные
+  // Возврат из архива
   const restoreFromArchive = async (id) => {
     await api.updateRecord(id, { status: 'Активно' });
     await refreshData();

@@ -5,16 +5,26 @@ import {
   IconRecords,
   IconDebt,
   IconArchive,
-  IconUser,
   IconLogOut,
   IconDownload,
 } from '../assets/icons';
 
+const IconUsers = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
 export const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { logout, user } = useAuth();
   const { activeTab, setActiveTab, stats } = useRecords();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
+
+  const isAdmin = user?.role === 'admin';
 
   // Поддержка PWA события установки
   useEffect(() => {
@@ -50,42 +60,57 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* 3 Основные кнопки навигации (для десктопа) */}
+        {/* Навигация для десктопа */}
         <nav className="nav-tabs desktop-only">
-          <button
-            type="button"
-            className={`nav-tab-btn ${activeTab === 'Записи' ? 'active' : ''}`}
-            onClick={() => setActiveTab('Записи')}
-          >
-            <IconRecords size={18} />
-            <span>Записи</span>
-            <span className="nav-tab-badge">{stats.active_count}</span>
-          </button>
+          {isAdmin ? (
+            /* Для admin — только вкладка Пользователи */
+            <button
+              type="button"
+              className={`nav-tab-btn ${activeTab === 'Пользователи' ? 'active' : ''}`}
+              onClick={() => setActiveTab('Пользователи')}
+            >
+              <IconUsers size={18} />
+              <span>Пользователи</span>
+            </button>
+          ) : (
+            /* Для обычных пользователей — стандартные вкладки */
+            <>
+              <button
+                type="button"
+                className={`nav-tab-btn ${activeTab === 'Записи' ? 'active' : ''}`}
+                onClick={() => setActiveTab('Записи')}
+              >
+                <IconRecords size={18} />
+                <span>Записи</span>
+                <span className="nav-tab-badge">{stats.active_count}</span>
+              </button>
 
-          <button
-            type="button"
-            className={`nav-tab-btn ${activeTab === 'Долг' ? 'active debt-active' : ''}`}
-            onClick={() => setActiveTab('Долг')}
-          >
-            <IconDebt size={18} />
-            <span>Долг</span>
-            <span className={`nav-tab-badge ${stats.debt_count > 0 ? 'badge-has-debt' : ''}`}>
-              {stats.debt_count}
-            </span>
-          </button>
+              <button
+                type="button"
+                className={`nav-tab-btn ${activeTab === 'Долг' ? 'active debt-active' : ''}`}
+                onClick={() => setActiveTab('Долг')}
+              >
+                <IconDebt size={18} />
+                <span>Долг</span>
+                <span className={`nav-tab-badge ${stats.debt_count > 0 ? 'badge-has-debt' : ''}`}>
+                  {stats.debt_count}
+                </span>
+              </button>
 
-          <button
-            type="button"
-            className={`nav-tab-btn ${activeTab === 'Архив' ? 'active' : ''}`}
-            onClick={() => setActiveTab('Архив')}
-          >
-            <IconArchive size={18} />
-            <span>Архив</span>
-            <span className="nav-tab-badge">{stats.archive_count}</span>
-          </button>
+              <button
+                type="button"
+                className={`nav-tab-btn ${activeTab === 'Архив' ? 'active' : ''}`}
+                onClick={() => setActiveTab('Архив')}
+              >
+                <IconArchive size={18} />
+                <span>Архив</span>
+                <span className="nav-tab-badge">{stats.archive_count}</span>
+              </button>
+            </>
+          )}
         </nav>
 
-        {/* Правый блок: PWA установка, профиль, кнопка Выйти */}
+        {/* Правый блок: PWA установка, кнопка Выйти */}
         <div className="navbar-actions">
           {isInstallable && (
             <button
@@ -97,11 +122,6 @@ export const Navbar = () => {
               <span>Установить</span>
             </button>
           )}
-
-          <div className="user-badge" title="Текущий пользователь">
-            <IconUser size={14} />
-            <span className="user-name-text">{user?.full_name || user?.username || 'Админ'}</span>
-          </div>
 
           <button
             className="btn btn-outline btn-sm logout-btn"

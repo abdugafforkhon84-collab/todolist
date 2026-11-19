@@ -131,4 +131,38 @@ export const api = {
     });
     return handleResponse(res);
   },
+
+  // Управление пользователями (только для admin)
+  async getUsers() {
+    const res = await fetch(`${BASE_URL}/api/users`, {
+      headers: getHeaders(true),
+    });
+    return handleResponse(res);
+  },
+
+  async createUser(userData) {
+    const res = await fetch(`${BASE_URL}/api/users`, {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(res);
+  },
+
+  async updateUser(id, userData) {
+    const res = await fetch(`${BASE_URL}/api/users/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(true),
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteUser(id) {
+    const res = await fetch(`${BASE_URL}/api/users/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(true),
+    });
+    return handleResponse(res);
+  },
 };

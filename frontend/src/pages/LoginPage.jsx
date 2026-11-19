@@ -5,8 +5,8 @@ import { Button } from '../components/ui/Button';
 
 export const LoginPage = () => {
   const { login } = useAuth();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,11 +22,6 @@ export const LoginPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFillDemo = () => {
-    setUsername('admin');
-    setPassword('admin123');
   };
 
   return (
@@ -62,7 +57,7 @@ export const LoginPage = () => {
             name="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="admin"
+            placeholder="Введите логин"
             required
             autoFocus
           />
@@ -86,28 +81,6 @@ export const LoginPage = () => {
             {loading ? 'Выполняется вход...' : 'Войти в систему'}
           </Button>
         </form>
-
-        <div className="demo-credentials-box">
-          <div style={{ fontWeight: 600, marginBottom: 4 }}>Данные по умолчанию:</div>
-          <div>Логин: <code>admin</code></div>
-          <div>Пароль: <code>admin123</code></div>
-          <button
-            type="button"
-            onClick={handleFillDemo}
-            style={{
-              marginTop: 8,
-              background: 'none',
-              border: 'none',
-              color: '#2563eb',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-              fontSize: '0.78rem',
-              padding: 0
-            }}
-          >
-            Подставить демонстрационные данные
-          </button>
-        </div>
       </div>
     </div>
   );

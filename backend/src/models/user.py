@@ -9,5 +9,6 @@ class User(Base):
     username = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(150), nullable=True)
-    role = Column(String(50), default="admin")
+    phone = Column(String(50), nullable=True)
+    role = Column(String(50), default="user")
     created_at = Column(DateTime, default=datetime.utcnow)

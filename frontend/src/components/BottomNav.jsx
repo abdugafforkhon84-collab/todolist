@@ -1,11 +1,35 @@
 import React from 'react';
 import { useRecords } from '../store/RecordContext';
+import { useAuth } from '../store/AuthContext';
 import { IconRecords, IconDebt, IconArchive } from '../assets/icons';
+
+const IconUsers = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
 
 export const BottomNav = () => {
   const { activeTab, setActiveTab, stats } = useRecords();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
-  const navItems = [
+  // Навигация для admin
+  const adminNavItems = [
+    {
+      id: 'Пользователи',
+      label: 'Пользователи',
+      icon: IconUsers,
+      count: 0,
+      isDanger: false,
+    },
+  ];
+
+  // Навигация для обычных пользователей
+  const userNavItems = [
     {
       id: 'Записи',
       label: 'Записи',
@@ -28,6 +52,8 @@ export const BottomNav = () => {
       isDanger: false,
     },
   ];
+
+  const navItems = isAdmin ? adminNavItems : userNavItems;
 
   return (
     <nav className="bottom-nav" aria-label="Нижняя навигация">
@@ -62,4 +88,3 @@ export const BottomNav = () => {
     </nav>
   );
 };
-

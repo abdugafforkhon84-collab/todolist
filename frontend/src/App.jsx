@@ -7,6 +7,7 @@ import { RecordsPage } from './pages/RecordsPage';
 import { DebtsPage } from './pages/DebtsPage';
 import { ArchivePage } from './pages/ArchivePage';
 import { LoginPage } from './pages/LoginPage';
+import { AdminPage } from './pages/AdminPage';
 import { RecordModal } from './components/RecordModal';
 import { PaymentModal } from './components/PaymentModal';
 import { IconPlus } from './assets/icons';
@@ -14,7 +15,6 @@ import { IconPlus } from './assets/icons';
 const DashboardContent = () => {
   const {
     activeTab,
-    stats,
     isRecordModalOpen,
     setIsRecordModalOpen,
     editingRecord,
@@ -22,6 +22,9 @@ const DashboardContent = () => {
     payingRecord,
     setPayingRecord,
   } = useRecords();
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   const handleOpenAddModal = () => {
     setEditingRecord(null);
@@ -33,13 +36,16 @@ const DashboardContent = () => {
       <Navbar />
 
       <main className="main-content">
-        {/* Экраны вкладок */}
-        {activeTab === 'Записи' && <RecordsPage />}
-        {activeTab === 'Долг' && <DebtsPage />}
-        {activeTab === 'Архив' && <ArchivePage />}
+        {/* Страница управления пользователями — только для admin */}
+        {isAdmin && activeTab === 'Пользователи' && <AdminPage />}
 
-        {/* Плавающая кнопка («+») ТОЛЬКО во вкладке «Записи» */}
-        {activeTab === 'Записи' && (
+        {/* Обычные вкладки — только для обычных пользователей */}
+        {!isAdmin && activeTab === 'Записи' && <RecordsPage />}
+        {!isAdmin && activeTab === 'Долг' && <DebtsPage />}
+        {!isAdmin && activeTab === 'Архив' && <ArchivePage />}
+
+        {/* Плавающая кнопка («+») ТОЛЬКО во вкладке «Записи» для обычных пользователей */}
+        {!isAdmin && activeTab === 'Записи' && (
           <button
             className="fab-btn"
             onClick={handleOpenAddModal}
